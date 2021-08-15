@@ -27,12 +27,16 @@ addEventListener('resize', () => {
 })
 
 // Objects
-class Object {
-  constructor(x, y, radius, color) {
+class Particle {
+  constructor(x, y, radius, color, radians) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
+    this.radians = 0
+    this.initialX = x;
+    this.initialY = y;
+    this.velocity = 0.05;
   }
 
   draw() {
@@ -44,18 +48,26 @@ class Object {
   }
 
   update() {
+    // Move points over time 
+    this.radians += this.velocity;
+    this.x = this.initialX + Math.cos(this.radians) * 100;
+    this.y = this.initialY + Math.sin(this.radians) * 100;
+
     this.draw()
   }
 }
 
 // Implementation
-let objects
+// Store all the particles in an array
+let particles;
 function init() {
-  objects = []
+  particles = []
 
-  for (let i = 0; i < 400; i++) {
-    // objects.push()
+  for (let i = 0; i < 1; i++) {
+    particles.push(new Particle(canvas.width / 2, canvas.height / 2, 5, 'blue'));
   }
+
+  console.log(particles);
 }
 
 // Animation Loop
@@ -63,10 +75,10 @@ function animate() {
   requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height)
 
-  c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y)
-  // objects.forEach(object => {
-  //  object.update()
-  // })
+  // c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y)
+  particles.forEach(particle => {
+    particle.update()
+  })
 }
 
 init()
