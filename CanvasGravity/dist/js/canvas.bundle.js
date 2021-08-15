@@ -122,7 +122,9 @@ var mouse = {
   x: innerWidth / 2,
   y: innerHeight / 2
 };
-var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']; // Event Listeners
+var colors = ['#B3A29B', '#6D4345', '#D9D9D9', '#9E7571', '#DACDC5'];
+var gravity = 1;
+var fraction = 0.99; // Event Listeners
 
 addEventListener('mousemove', function (event) {
   mouse.x = event.clientX;
@@ -131,6 +133,9 @@ addEventListener('mousemove', function (event) {
 addEventListener('resize', function () {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
+  init();
+});
+addEventListener('click', function () {
   init();
 }); // Utility Functions
 
@@ -143,52 +148,91 @@ function randomColor(colors) {
 } // Objects
 
 
-var _Object = /*#__PURE__*/function () {
-  function Object(x, y, radius, color) {
-    _classCallCheck(this, Object);
+var Ball = /*#__PURE__*/function () {
+  function Ball(x, y, dx, dy, radius, color) {
+    _classCallCheck(this, Ball);
 
     this.x = x;
     this.y = y;
+    this.dx = dx;
+    this.dy = dy;
     this.radius = radius;
     this.color = color;
   }
 
-  _createClass(Object, [{
+  _createClass(Ball, [{
     key: "draw",
     value: function draw() {
       c.beginPath();
       c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
       c.fillStyle = this.color;
-      c.fill();
+      c.fill(); //c.stroke();
+
       c.closePath();
     }
   }, {
     key: "update",
     value: function update() {
+      if (this.y + this.radius + this.dy > canvas.height) {
+        this.dy = -this.dy * fraction;
+      } else {
+        // creates accerlation with gravity by adding a specific value to velocity
+        this.dy += gravity; //console.log(this.dy);
+      }
+
+      if (this.x + this.radius + this.dx > canvas.width || this.x - this.radius <= 0) {
+        this.dx = -this.dx;
+      }
+
+      this.x += this.dx;
+      this.y += this.dy;
       this.draw();
     }
   }]);
 
-  return Object;
+  return Ball;
 }(); // Implementation
 
 
 var objects;
+var ball; // will bc connecting all the balls 
+
+var ballArray = [];
 
 function init() {
-  objects = [];
+  // ball = new Ball(canvas.width / 2,
+  //   canvas.height / 2, 2, 30, '#F2B199');
+  //console.log(ball);
+  ballArray = [];
 
-  for (var i = 0; i < 400; i++) {// objects.push()
+  for (var i = 0; i < 200; i++) {
+    var radius = randeomIntFromRange(10, 30);
+    var x = randeomIntFromRange(radius, canvas.width - radius);
+    var y = randeomIntFromRange(0, canvas.height - radius);
+    var dx = randeomIntFromRange(-2, 2);
+    var color = randomColor(colors);
+    var dy = randeomIntFromRange(-2, 2);
+    ballArray.push(new Ball(x, y, dx, dy, radius, color));
   }
+
+  console.log(ballArray); // for (let i = 0; i < 400; i++) {
+  //   // objects.push()
+  // }
 } // Animation Loop
 
 
 function animate() {
   requestAnimationFrame(animate);
   c.clearRect(0, 0, canvas.width, canvas.height);
-  c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y); // objects.forEach(object => {
+
+  for (var i = 0; i < ballArray.length; i++) {
+    ballArray[i].update();
+  } // ball.update();
+  //c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y)
+  // objects.forEach(object => {
   //  object.update()
   // })
+
 }
 
 init();
