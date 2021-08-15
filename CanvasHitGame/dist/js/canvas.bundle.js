@@ -199,18 +199,80 @@ var Projectile = /*#__PURE__*/function () {
 
   return Projectile;
 }();
+/**
+ * Define the Enemy class
+ */
+
+
+var Enemy = /*#__PURE__*/function () {
+  function Enemy(x, y, radius, color, velocity) {
+    _classCallCheck(this, Enemy);
+
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = color;
+    this.velocity = velocity;
+  }
+
+  _createClass(Enemy, [{
+    key: "draw",
+    value: function draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      this.draw();
+      this.x += this.velocity.x;
+      this.y += this.velocity.y;
+    }
+  }]);
+
+  return Enemy;
+}();
 
 var x = canvas.width / 2;
 var y = canvas.height / 2; // Creates a player
 
 var player = new Player(x, y, 30, 'blue');
 console.log(player);
+var projectiles = [];
+var enemies = [];
 var projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', {
   x: 1,
   y: -1
 }); // Creates the projectils array that groups all the projectils draw and alter at the same time
+// Spawns enemites from broders to the center 
 
-var projectiles = []; // Loop
+function spawnEnemies() {
+  setInterval(function () {
+    var radius = Math.random() * (30 - 8) + 8;
+    var x;
+    var y;
+
+    if (Math.random() < 0.5) {
+      x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
+      y = Math.random() * canvas.height;
+    } else {
+      x = Math.random() * canvas.width;
+      y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+    } //const y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+
+
+    var color = "orange";
+    var angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x);
+    var velocity = {
+      x: Math.cos(angle),
+      y: Math.sin(angle)
+    };
+    enemies.push(new Enemy(x, y, radius, color, velocity)); // console.log(enemies);
+  }, 1000);
+} // Loop
+
 
 function animate() {
   requestAnimationFrame(animate);
@@ -218,6 +280,23 @@ function animate() {
   player.draw();
   projectiles.forEach(function (projectile) {
     projectile.update();
+  });
+  enemies.forEach(function (enemy, index) {
+    enemy.update(); // for each enemy inside the loop, 
+    // we would like to test the distance between the enemy and the projectile
+
+    projectiles.forEach(function (projectile, projectileIndex) {
+      var dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y); // once the projectile and enemy gets collaid, removes the enemy
+
+      if (dist - enemy.radius - projectile.radius < 1) {
+        // removes slash
+        setTimeout(function () {
+          // removes one enemy at this specific point 
+          enemies.splice(index, 1);
+          projectiles.splice(projectileIndex, 1);
+        });
+      }
+    });
   });
 } // Creates a projectile whenever clicks on the screen
 
@@ -237,7 +316,8 @@ addEventListener('click', function (event) {
   velocity)); // projectile.draw();
   // projectile.update();
 });
-animate(); // const canvas = document.querySelector('canvas')
+animate();
+spawnEnemies(); // const canvas = document.querySelector('canvas')
 // const c = canvas.getContext('2d')
 // canvas.width = innerWidth
 // canvas.height = innerHeight
