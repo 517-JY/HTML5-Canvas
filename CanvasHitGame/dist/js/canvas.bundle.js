@@ -138,7 +138,7 @@ canvas.height = innerHeight; // console.log(canvas);
 
 console.log(ctx);
 /**
- * Create a player
+ * Define the Player class
  * What properties should a player has
  */
 
@@ -164,12 +164,80 @@ var Player = /*#__PURE__*/function () {
 
   return Player;
 }();
+/**
+ * Define the Projectile class
+ */
+
+
+var Projectile = /*#__PURE__*/function () {
+  function Projectile(x, y, radius, color, velocity) {
+    _classCallCheck(this, Projectile);
+
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = color;
+    this.velocity = velocity;
+  }
+
+  _createClass(Projectile, [{
+    key: "draw",
+    value: function draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+  }, {
+    key: "update",
+    value: function update() {
+      this.draw();
+      this.x += this.velocity.x;
+      this.y += this.velocity.y;
+    }
+  }]);
+
+  return Projectile;
+}();
 
 var x = canvas.width / 2;
-var y = canvas.height / 2;
+var y = canvas.height / 2; // Creates a player
+
 var player = new Player(x, y, 30, 'blue');
-player.draw(); // console.log(player);
-// const canvas = document.querySelector('canvas')
+console.log(player);
+var projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', {
+  x: 1,
+  y: -1
+}); // Creates the projectils array that groups all the projectils draw and alter at the same time
+
+var projectiles = []; // Loop
+
+function animate() {
+  requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  player.draw();
+  projectiles.forEach(function (projectile) {
+    projectile.update();
+  });
+} // Creates a projectile whenever clicks on the screen
+
+
+addEventListener('click', function (event) {
+  // console.log(event);
+  // 1. get the angles from the center to wherever the mouse click is 
+  var angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2);
+  console.log(angle); // 2. get the velocity (ratio) using the calculated angle
+
+  var velocity = {
+    // from -1 to 1
+    x: Math.cos(angle),
+    y: Math.sin(angle)
+  };
+  projectiles.push(new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', // sets velocities with the whiteboard math
+  velocity)); // projectile.draw();
+  // projectile.update();
+});
+animate(); // const canvas = document.querySelector('canvas')
 // const c = canvas.getContext('2d')
 // canvas.width = innerWidth
 // canvas.height = innerHeight
