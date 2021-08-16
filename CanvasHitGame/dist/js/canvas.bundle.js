@@ -238,11 +238,11 @@ var Enemy = /*#__PURE__*/function () {
 var x = canvas.width / 2;
 var y = canvas.height / 2; // Creates a player
 
-var player = new Player(x, y, 30, 'blue');
+var player = new Player(x, y, 10, 'white');
 console.log(player);
 var projectiles = [];
 var enemies = [];
-var projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', {
+var projectile = new Projectile(canvas.width / 2, canvas.height / 2, 5, 'white', {
   x: 1,
   y: -1
 }); // Creates the projectils array that groups all the projectils draw and alter at the same time
@@ -263,7 +263,7 @@ function spawnEnemies() {
     } //const y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
 
 
-    var color = "orange";
+    var color = "hsl(".concat(Math.random() * 360, ", 50%, 50%)");
     var angle = Math.atan2(canvas.height / 2 - y, canvas.width / 2 - x);
     var velocity = {
       x: Math.cos(angle),
@@ -278,7 +278,8 @@ var animationId; // Loop
 function animate() {
   // By default, returns what frame you 're currently on
   animationId = requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   player.draw();
   projectiles.forEach(function (projectile, projectileIndex) {
     projectile.update(); // removes from edges of screen
@@ -321,15 +322,15 @@ addEventListener('click', function (event) {
   // console.log(projectiles)
   // console.log(event);
   // 1. get the angles from the center to wherever the mouse click is 
-  var angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2);
-  console.log(angle); // 2. get the velocity (ratio) using the calculated angle
+  var angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2); // console.log(angle);
+  // 2. get the velocity (ratio) using the calculated angle
 
   var velocity = {
     // from -1 to 1
-    x: Math.cos(angle),
-    y: Math.sin(angle)
+    x: Math.cos(angle) * 5,
+    y: Math.sin(angle) * 5
   };
-  projectiles.push(new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red', // sets velocities with the whiteboard math
+  projectiles.push(new Projectile(canvas.width / 2, canvas.height / 2, 5, 'white', // sets velocities with the whiteboard math
   velocity)); // projectile.draw();
   // projectile.update();
 });

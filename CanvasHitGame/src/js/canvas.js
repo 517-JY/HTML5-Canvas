@@ -111,7 +111,7 @@ const x = canvas.width / 2;
 const y = canvas.height / 2;
 
 // Creates a player
-const player = new Player(x, y, 30, 'blue');
+const player = new Player(x, y, 10, 'white');
 console.log(player);
 const projectiles = [];
 const enemies = [];
@@ -122,7 +122,7 @@ const projectile = new Projectile(
   canvas.width / 2,
   canvas.height / 2,
   5,
-  'red',
+  'white',
   {
     x: 1,
     y: -1
@@ -148,7 +148,8 @@ function spawnEnemies() {
 
     //const y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
 
-    const color = "orange";
+
+    const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
 
     const angle = Math.atan2(
       canvas.height / 2 - y,
@@ -172,7 +173,8 @@ let animationId
 function animate() {
   // By default, returns what frame you 're currently on
   animationId = requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   player.draw();
 
@@ -235,20 +237,20 @@ addEventListener('click', (event) => {
     event.clientY - canvas.height / 2,
     event.clientX - canvas.width / 2
   )
-  console.log(angle);
+  // console.log(angle);
 
   // 2. get the velocity (ratio) using the calculated angle
   const velocity = {
     // from -1 to 1
-    x: Math.cos(angle),
-    y: Math.sin(angle)
+    x: Math.cos(angle) * 5,
+    y: Math.sin(angle) * 5
   }
 
   projectiles.push(new Projectile(
     canvas.width / 2,
     canvas.height / 2,
     5,
-    'red',
+    'white',
     // sets velocities with the whiteboard math
     velocity
   ))
