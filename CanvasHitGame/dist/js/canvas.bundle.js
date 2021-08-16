@@ -271,19 +271,35 @@ function spawnEnemies() {
     };
     enemies.push(new Enemy(x, y, radius, color, velocity)); // console.log(enemies);
   }, 1000);
-} // Loop
+}
 
+var animationId; // Loop
 
 function animate() {
-  requestAnimationFrame(animate);
+  // By default, returns what frame you 're currently on
+  animationId = requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   player.draw();
-  projectiles.forEach(function (projectile) {
-    projectile.update();
+  projectiles.forEach(function (projectile, projectileIndex) {
+    projectile.update(); // removes from edges of screen
+
+    if (projectile.x + projectile.radius < 0 || projectile.x - projectile.radius > canvas.width || projectile.y + projectile.radius < 0 || projectile.y - projectile.radius > canvas.height) {
+      setTimeout(function () {
+        projectiles.splice(projectileIndex, 1);
+      }, 0);
+    }
   });
   enemies.forEach(function (enemy, index) {
-    enemy.update(); // for each enemy inside the loop, 
+    enemy.update(); // Calculates the distance between the enemy and the player
+
+    var dist = Math.hypot(player.x - enemy.x, player.y - enemy.y); // Ends Game
+
+    if (dist - enemy.radius - player.radius < 1) {
+      // Pause the game
+      cancelAnimationFrame(animationId);
+    } // for each enemy inside the loop, 
     // we would like to test the distance between the enemy and the projectile
+
 
     projectiles.forEach(function (projectile, projectileIndex) {
       var dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y); // once the projectile and enemy gets collaid, removes the enemy
@@ -302,6 +318,7 @@ function animate() {
 
 
 addEventListener('click', function (event) {
+  // console.log(projectiles)
   // console.log(event);
   // 1. get the angles from the center to wherever the mouse click is 
   var angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2);
@@ -317,11 +334,7 @@ addEventListener('click', function (event) {
   // projectile.update();
 });
 animate();
-spawnEnemies(); // const canvas = document.querySelector('canvas')
-// const c = canvas.getContext('2d')
-// canvas.width = innerWidth
-// canvas.height = innerHeight
-// const mouse = {
+spawnEnemies(); // const mouse = {
 //   x: innerWidth / 2,
 //   y: innerHeight / 2
 // }
